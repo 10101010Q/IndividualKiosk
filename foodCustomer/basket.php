@@ -1,12 +1,4 @@
 <!DOCTYPE html>
-<!-- UPDATE orders
-SET orders_subtotal = (SELECT SUM(food.food_price * orders_item.item_quantity)
-                       FROM food 
-                       JOIN orders_item
-                       USING(food_id)
-                       WHERE orders_id = (SELECT orders_id FROM orders WHERE user_id = 1 AND orders_status IS NULL)
-                       )
-WHERE user_id = 1 AND orders_status IS NULL; -->
 <html>
     <head>
         <link rel="stylesheet" href="../lucasStyle.css">
@@ -18,7 +10,8 @@ WHERE user_id = 1 AND orders_status IS NULL; -->
         <?php
                 $connectDB = mysqli_connect("localhost", "root", "", "web_project");
                 $user_id = $_SESSION['user_id'];
-                $DBdata = mysqli_query($connectDB, "SELECT * FROM ((orders JOIN orders_item USING (orders_id)) JOIN food USING (food_id)) WHERE (user_id = '$user_id' AND orders_status IS NULL)");
+                $kiosk_id = $_SESSION['kiosk_id'];
+                $DBdata = mysqli_query($connectDB, "SELECT * FROM ((orders JOIN orders_item USING (orders_id)) JOIN food USING (food_id)) WHERE user_id = '$user_id' AND orders_status IS NULL AND vendor_id = (SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id')");
                 if(mysqli_num_rows($DBdata) > 0) {
                     mysqli_query($connectDB, "UPDATE orders
                                                 SET orders_subtotal = (SELECT SUM(food.food_price * orders_item.item_quantity)

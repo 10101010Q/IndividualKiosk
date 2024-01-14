@@ -23,8 +23,23 @@ if(isset($_POST['submit'])){
       if($pass != $cpass){
          $error[] = 'password not matched!';
       }else{
-         $insert = "INSERT INTO user_form(name, email, password, user_type) VALUES('$name','$email','$pass','$user_type')";
+         $insert = "INSERT INTO user_form(name, email, password, user_type, status) VALUES('$name','$email','$pass','$user_type', 1)";
          mysqli_query($conn, $insert);
+         //////////
+         $connectDB = mysqli_connect('localhost', 'root', '', 'web_project');
+         if($user_type == 'user') {
+            $insert2 = "INSERT INTO registered_user VALUES ('', '$name', '$pass', '$email', 10, 10)";
+            mysqli_query($connectDB, $insert2);
+            $insert3 = "INSERT INTO registered_or_general_user VALUES ((SELECT MAX(user_id) FROM registered_user), '012-3456789')";
+            mysqli_query($connectDB, $insert3);
+         } else if($user_type == 'vendor') {
+            $insert4 = "INSERT INTO food_vendor VALUES ('', 1, '$name', '$pass', '$email', '019-8765432', 'approve')";
+            mysqli_query($connectDB, $insert4);
+         } else if($user_type == 'admin') {
+            $insert5 = "INSERT INTO administrator VALUES ('', '$name', '$pass', '$email', '011-1111111')";
+            mysqli_query($connectDB, $insert5);
+         }
+         /////////
          header('location:login_form.php');
       }
    }

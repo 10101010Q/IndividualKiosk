@@ -5,20 +5,23 @@
         <script src="../lucasIndex.js"></script>
     </head>
     <body>
-        <?php include('../partials/customerMenuBar.php')?>
-        <div class="orders_status_top_container">
+    <?php 
+            include('../partials/customerOrderStatusMenuBar.php');
+            $connectDB = mysqli_connect("localhost", "root", "", "web_project");
+            $user_id = $_SESSION['user_id'];
+            $ordersStatusData = mysqli_query($connectDB, "SELECT orders_status 
+                                                            FROM orders 
+                                                            WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                                FROM orders 
+                                                                                WHERE user_id = '$user_id')");
+            if(mysqli_num_rows($ordersStatusData) > 0) {
+                $ordersStatusRow = mysqli_fetch_array($ordersStatusData);
+    ?>
+                <div class="orders_status_top_container">
             <table>
                 <tr>
                     <td rowspan="2">
     <?php
-                        $connectDB = mysqli_connect("localhost", "root", "", "web_project");
-                        $user_id = $_SESSION['user_id'];
-                        $kiosk_id = $_SESSION['kiosk_id'];
-                        $ordersStatusRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT orders_status 
-                                                                                        FROM orders 
-                                                                                        WHERE orders_id = (SELECT MAX(orders_id) 
-                                                                                                            FROM orders 
-                                                                                                            WHERE user_id = '$user_id')"));
                         if($ordersStatusRow['orders_status'] == 'Ordered') {
     ?>
                             <img src="../images/foodOrdered.png" alt="foodOrdered">
@@ -90,8 +93,15 @@
         <br>
         <div class="payment_info_container">
     <?php
+            $vendorData = mysqli_query($connectDB, "SELECT * FROM (((orders 
+                                                    JOIN orders_item USING (orders_id)) 
+                                                    JOIN food USING (food_id)) 
+                                                    JOIN food_vendor USING(vendor_id))
+                                                    WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                        FROM orders 
+                                                                        WHERE user_id = '$user_id')");
             $userInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_or_general_user JOIN registered_user USING(user_id) WHERE user_id = '$user_id'"));
-            $vendorInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM food_vendor WHERE vendor_id = (SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id')"));
+            $vendorInfoRow = mysqli_fetch_array($vendorData);
     ?>
             <table class="align_table1">
                 <tr><td><b>Your info:</b></td></tr>
@@ -108,7 +118,19 @@
                     <td>Subtotal</td>
                     <td>
     <?php
-                        echo "RM {$_SESSION['subtotal']}";
+                        $paymentRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * 
+                                                                                    FROM payment 
+                                                                                    WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                                                        FROM orders 
+                                                                                                        WHERE user_id = '$user_id')"));
+                        if(isset($_SESSION['subtotal'])) {
+                            echo "RM {$_SESSION['subtotal']}";
+                        } else {
+                            $ordersSubtotal = $vendorInfoRow['orders_subtotal'];
+                            $pointsRedeemed = $paymentRow['points_redeemed'];
+                            $subtotal = $ordersSubtotal + $pointsRedeemed;
+                            echo "RM {$subtotal}";
+                        }
     ?>    
                     </td>
                 </tr>
@@ -116,11 +138,6 @@
                     <td>Points Redeemed</td>
                     <td>
     <?php                   
-                        $paymentRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * 
-                                                                                    FROM payment 
-                                                                                    WHERE orders_id = (SELECT MAX(orders_id) 
-                                                                                                        FROM orders 
-                                                                                                        WHERE user_id = '$user_id')"));
                         echo "{$paymentRow['points_redeemed']} points";
     ?>
                     </td>
@@ -157,8 +174,18 @@
                 </tr>
             </table>
         </div>
-        <?php
+    <?php
             if(!isset($_SESSION['paid']) && $ordersStatusRow['orders_status'] == 'Completed') {
+                mysqli_query($connectDB, "UPDATE orders 
+                                            SET orders_collectTime = (SELECT CURRENT_TIMESTAMP()) 
+                                            WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                FROM orders 
+                                                                WHERE user_id = '$user_id')");
+                mysqli_query($connectDB, "UPDATE orders 
+                                            SET order_date = (SELECT CURRENT_DATE()) 
+                                            WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                FROM orders 
+                                                                WHERE user_id = '$user_id')");
                 mysqli_query($connectDB, "UPDATE registered_user 
                                             SET registered_points = registered_points - (SELECT points_redeemed 
                                                                                             FROM payment 
@@ -171,8 +198,22 @@
                                                                                                             FROM orders 
                                                                                                             WHERE user_id = '$user_id' AND orders_status = 'Completed')) 
                                             WHERE user_id = '$user_id'");
+                if($paymentRow['payment_method'] == 'Membership Card') {
+                    mysqli_query($connectDB, "UPDATE registered_user 
+                                                SET registered_cardBalance = registered_cardBalance - (SELECT orders_subtotal 
+                                                                                                        FROM orders 
+                                                                                                        WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                                                                            FROM orders 
+                                                                                                                            WHERE user_id = '$user_id')) 
+                                                WHERE user_id = '$user_id'");
+                }
                 $_SESSION['paid'] = 'yes';
             }
-        ?>
+    ?>
+    <?php
+            } else {
+                echo 'No order';
+            }
+    ?>
     </body>
 </html>

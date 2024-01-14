@@ -1,6 +1,6 @@
 <?php
 
-@include 'config.php';
+$connectDB = mysqli_connect('localhost', 'root', '', 'web_project');
 
 session_start();
 
@@ -10,20 +10,21 @@ if(isset($_POST['submit'])){
 
    $select = " SELECT * FROM registered_or_general_user WHERE registered_phoneNum = '$phoneNum'";
 
-   $result = mysqli_query($conn, $select);
+   $result = mysqli_query($connectDB, $select);
 
    if(mysqli_num_rows($result) > 0){
         $row = mysqli_fetch_array($result);
         $_SESSION['user_id'] = $row['user_id'];
    }else{
         $insert = "INSERT INTO registered_or_general_user VALUES ('', '$phoneNum')";
-        mysqli_query($conn, $insert);
+        mysqli_query($connectDB, $insert);
         $select = " SELECT * FROM registered_or_general_user WHERE registered_phoneNum = '$phoneNum'";
-        $result = mysqli_query($conn, $select);
+        $result = mysqli_query($connectDB, $select);
         $row = mysqli_fetch_array($result);
         $_SESSION['user_id'] = $row['user_id'];
    }
    $_SESSION['guest'] = 'yes';
+   $_SESSION['user_name'] = true;
    header('location:../foodCustomer/customerViewKiosk.php');
 
 };

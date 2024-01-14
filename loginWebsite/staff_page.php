@@ -4,7 +4,7 @@
 
 session_start();
 
-if(!isset($_SESSION['admin_id'])){
+if(!isset($_SESSION['staff_name'])){
    header('location:login_form.php');
 }
 
@@ -28,13 +28,12 @@ if(!isset($_SESSION['admin_id'])){
 
    <div class="content">
       <h3>hi, <span>Staff</span></h3>
-      <h1>welcome <span><?php echo $_SESSION['admin_username'] ?></span></h1>
+      <h1>welcome <span><?php echo $_SESSION['staff_name'] ?></span></h1>
       <p>this is an staff page</p>
       <a href="login_form.php" class="btn">login</a>
       <a href="register_form.php" class="btn">register</a>
       <a href="logout.php" class="btn">logout</a>
       <a href="qr.php" class="btn">QR</a>
-      <a href="../foodAdmin/adminViewKiosk.php" class="btn">Manage All Kiosk</a>
    </div>
 
 </div>

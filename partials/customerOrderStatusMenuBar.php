@@ -22,24 +22,10 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-3">
-                        <a class="nav-link active" aria-current="page" href="customerViewKiosk.php">Home</a>
+                        <a class="nav-link" aria-current="page" href="customerViewKiosk.php">Home</a>
                     </li>
                     <li class="nav-item mx-3">
-<?php
-                        $user_id = $_SESSION['user_id'];
-                        $orderStatus = mysqli_query($conn, "SELECT * FROM orders WHERE (orders_status IN ('Ordered', 'Prepared', 'Completed')) AND orders_id = (SELECT MAX(orders_id) FROM orders WHERE user_id = '$user_id')");
-?>
-                        <a class="nav-link" href="
-<?php                       
-                            if(mysqli_num_rows($orderStatus) > 0) {
-                                if(isset($_SESSION['guest'])) {
-                                    echo "../foodCustomer/genOrderStatus.php";
-                                } else {
-                                    echo "../foodCustomer/regOrderStatus.php";
-                                }
-                            }
-?>
-                        ">Order Status</a>
+                        <a class="nav-link active" href="">Order Status</a>
                     </li>
                     <li class="nav-item mx-3">
                         <a class="nav-link" href="

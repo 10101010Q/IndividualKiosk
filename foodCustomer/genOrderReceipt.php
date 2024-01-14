@@ -4,12 +4,11 @@
         <link rel="stylesheet" href="../lucasStyle.css">
     </head>
     <body>
-        <?php include('../partials/customerMenuBar.php');?>
+        <?php include('../partials/customerOrderStatusMenuBar.php');?>
         <table>
     <?php
             $connectDB = mysqli_connect("localhost", "root", "", "web_project");
             $user_id = $_SESSION['user_id'];
-            $kiosk_id = $_SESSION['kiosk_id'];
             $DBdata = mysqli_query($connectDB, "SELECT * 
                                                 FROM ((orders 
                                                 JOIN orders_item USING (orders_id)) 
@@ -45,8 +44,15 @@
         <br>
         <div class="payment_info_container">
     <?php
+            $vendorData = mysqli_query($connectDB, "SELECT * FROM (((orders 
+                                                    JOIN orders_item USING (orders_id)) 
+                                                    JOIN food USING (food_id)) 
+                                                    JOIN food_vendor USING(vendor_id))
+                                                    WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                        FROM orders 
+                                                                        WHERE user_id = '$user_id')");
             $userInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_or_general_user WHERE user_id = '$user_id'"));
-            $vendorInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM food_vendor WHERE vendor_id = (SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id')"));
+            $vendorInfoRow = mysqli_fetch_array($vendorData);
     ?>
             <table class="align_table4">
                 <tr><td><b>Your info:</b></td></tr>

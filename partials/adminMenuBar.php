@@ -6,6 +6,7 @@
 
 <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="../node_modules/popper.min.js"></script>
+<script src="../node_modules/jquery-3.7.1.min.js"></script>
 <script src="../node_modules/script.js"></script>
 
 
@@ -31,7 +32,7 @@
                     </li>
                 </ul>
             </div>
-            <a href="../loginWebsite/staff_page.php" class="login me-3">
+            <a href="../loginWebsite/admin_page.php" class="login me-3">
                 <button type="button" class="btn btn-success p-2">
                     <i class="fa-regular fa-user"></i>
                     Admin

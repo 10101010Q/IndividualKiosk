@@ -5,7 +5,7 @@
         <script src="../lucasIndex.js"></script>
     </head>
     <body>
-        <?php include('../partials/customerMenuBar.php');?>
+        <?php include('../partials/customerOrderStatusMenuBar.php');?>
         <div class="orders_status_top_container">
             <table>
                 <tr>
@@ -13,7 +13,6 @@
     <?php
                         $connectDB = mysqli_connect("localhost", "root", "", "web_project");
                         $user_id = $_SESSION['user_id'];
-                        $kiosk_id = $_SESSION['kiosk_id'];
                         $ordersStatusRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT orders_status 
                                                                                         FROM orders 
                                                                                         WHERE orders_id = (SELECT MAX(orders_id) 
@@ -90,8 +89,15 @@
         <br>
         <div class="payment_info_container">
     <?php
+            $vendorData = mysqli_query($connectDB, "SELECT * FROM (((orders 
+                                                    JOIN orders_item USING (orders_id)) 
+                                                    JOIN food USING (food_id)) 
+                                                    JOIN food_vendor USING(vendor_id))
+                                                    WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                        FROM orders 
+                                                                        WHERE user_id = '$user_id')");
             $userInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_or_general_user WHERE user_id = '$user_id'"));
-            $vendorInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM food_vendor WHERE vendor_id = (SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id')"));
+            $vendorInfoRow = mysqli_fetch_array($vendorData);
     ?>
             <table class="align_table4">
                 <tr><td><b>Your info:</b></td></tr>
@@ -118,5 +124,20 @@
                 </tr>
             </table>
         </div>
+    <?php
+        if(!isset($_SESSION['paid']) && $ordersStatusRow['orders_status'] == 'Completed') {
+            mysqli_query($connectDB, "UPDATE orders 
+                                        SET orders_collectTime = (SELECT CURRENT_TIMESTAMP()) 
+                                        WHERE orders_id = (SELECT MAX(orders_id) 
+                                                            FROM orders 
+                                                            WHERE user_id = '$user_id')");
+            mysqli_query($connectDB, "UPDATE orders 
+                                        SET order_date = (SELECT CURRENT_DATE()) 
+                                        WHERE orders_id = (SELECT MAX(orders_id) 
+                                                            FROM orders 
+                                                            WHERE user_id = '$user_id')");
+            $_SESSION['paid'] = 'yes';
+        }
+    ?>
     </body>
 </html>

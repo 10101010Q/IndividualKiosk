@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-3">
-                        <a class="nav-link active" aria-current="page" href="customerViewKiosk.php">Home</a>
+                        <a class="nav-link" aria-current="page" href="customerViewKiosk.php">Home</a>
                     </li>
                     <li class="nav-item mx-3">
 <?php
@@ -42,7 +42,7 @@
                         ">Order Status</a>
                     </li>
                     <li class="nav-item mx-3">
-                        <a class="nav-link" href="
+                        <a class="nav-link active" href="
 <?php
                             if(isset($_SESSION['guest'])) {
                                 echo "";

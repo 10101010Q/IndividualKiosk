@@ -8,8 +8,11 @@
         $addFoodtoBasket = $_POST['addFoodtoBasket'];
         $ordersData = mysqli_query($connectDB, "SELECT * FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL");
         $ordersItemData = mysqli_query($connectDB, "SELECT * FROM orders_item WHERE food_id = '$addFoodtoBasket' AND orders_id = (SELECT orders_id FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL)");
+        $vendor_idRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id'"));
+        $vendor_id = $vendor_idRow['vendor_id'];
         if(mysqli_num_rows($ordersData) == 0) {
-            mysqli_query($connectDB, "INSERT INTO orders(orders_id, user_id, orders_subtotal) VALUES ('', '$user_id', '')");
+            mysqli_query($connectDB, "INSERT INTO orders(orders_id, user_id, vendor_id, orders_subtotal) VALUES ('', '$user_id', '$vendor_id', '')");
+            $_SESSION['basket_id'] = $kiosk_id;
         }
         if(mysqli_num_rows($ordersItemData) == 0 ) {
             mysqli_query($connectDB, "INSERT INTO orders_item VALUES ('$addFoodtoBasket', (SELECT orders_id FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL), 1, '')");
@@ -43,6 +46,11 @@
     if(isset($_POST['delete'])) {
         $deleteIndex = $_POST['delete'];
         mysqli_query($connectDB, "DELETE FROM orders_item WHERE food_id = $deleteIndex AND orders_id = (SELECT orders_id FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL)");
+        $ordersData = mysqli_query($connectDB, "SELECT * FROM orders_item WHERE orders_id = (SELECT MAX(orders_id) FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL)");
+        if(mysqli_num_rows($ordersData) == 0) {
+            mysqli_query($connectDB, "DELETE FROM orders WHERE user_id = '$user_id' AND orders_status IS NULL");
+            unset($_SESSION['basket_id']);
+        }
         header("Location: ./foodCustomer/basket.php");
     }
     if(isset($_POST['minus'])) {

@@ -35,6 +35,7 @@ if(!isset($_SESSION['admin_name'])){
       <a href="logout.php" class="btn">logout</a>
       <a href="active_deactive.php" class="btn">approve</a>
       <a href="qr.php" class="btn">QR</a>
+      <a href="../foodAdmin/adminViewKiosk.php" class="btn">Manage All Kiosk</a><!-- -->
    </div>
 
 </div>

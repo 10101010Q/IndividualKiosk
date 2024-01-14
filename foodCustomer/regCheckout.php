@@ -10,7 +10,6 @@
     <?php
                 $connectDB = mysqli_connect("localhost", "root", "", "web_project");
                 $user_id = $_SESSION['user_id'];
-                $kiosk_id = $_SESSION['kiosk_id'];
                 if(isset($_POST['pointsRedeemed'])) {
                     foreach ($_POST['specialInstruction'] as $foodId => $instruction) {
                         mysqli_query($connectDB, "UPDATE orders_item 
@@ -43,8 +42,15 @@
             <br>
             <div class="payment_info_container">
     <?php
+                $vendorData = mysqli_query($connectDB, "SELECT * FROM (((orders 
+                                                        JOIN orders_item USING (orders_id)) 
+                                                        JOIN food USING (food_id)) 
+                                                        JOIN food_vendor USING(vendor_id))
+                                                        WHERE orders_id = (SELECT MAX(orders_id) 
+                                                                            FROM orders 
+                                                                            WHERE user_id = '$user_id')");
                 $userInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_or_general_user JOIN registered_user USING(user_id) WHERE user_id = '$user_id'"));
-                $vendorInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM food_vendor WHERE vendor_id = (SELECT vendor_id FROM kiosk WHERE kiosk_id = '$kiosk_id')"));
+                $vendorInfoRow = mysqli_fetch_array($vendorData);
     ?>
                 <table class="align_table1">
                     <tr><td><b>Your info:</b></td></tr>
@@ -76,7 +82,7 @@
                         <td>
     <?php                   
                             $_SESSION['pointsRedeemed'] = 0;
-                            if(empty($_POST['pointsRedeemed']) || $_POST['pointsRedeemed'] < 1) {
+                            if(empty($_POST['pointsRedeemed']) || $_POST['pointsRedeemed'] < 1 || $_POST['pointsRedeemed'] > $row['orders_subtotal']) {
                                 echo '0 point';
                             } else {
                                 $pointsRedeemed = $_POST['pointsRedeemed'];
@@ -93,13 +99,16 @@
                         <td class="row_padding_top">Total</td>
                         <td class="row_padding_top">
     <?php
-                             if(empty($_POST['pointsRedeemed']) || $_POST['pointsRedeemed'] < 1) {
+                             if(empty($_POST['pointsRedeemed']) || $_POST['pointsRedeemed'] < 1 || $_POST['pointsRedeemed'] > $row['orders_subtotal']) {
+                                $subtotalAfterRedeemed = false;
                                 echo "RM {$row['orders_subtotal']}";
                             } else {
+                                $subtotalAfterRedeemed = false;
                                 $pointsRedeemed = $_POST['pointsRedeemed'];
                                 $userInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_user WHERE user_id = '$user_id'"));
                                 if($pointsRedeemed <= $userInfoRow['registered_points']) {
-                                    echo 'RM ' . ($row['orders_subtotal'] - (int)$pointsRedeemed);
+                                    $subtotalAfterRedeemed = $row['orders_subtotal'] - (int)$pointsRedeemed;
+                                    echo "RM {$subtotalAfterRedeemed}";
                                 }
                             }
     ?>
@@ -116,7 +125,27 @@
                     <tr>
                         <td class="row_padding_top">Payment Method</td>
                         <td class="row_padding_top">
-                            <input type="radio" name="payment_method" value="Membership Card" id="card" required <?php if(isset($_POST['payment_method']) && ($_POST['payment_method'] == 'Membership Card')) { echo 'checked';}?>>
+                            <input type="radio" name="payment_method" value="Membership Card" id="card" required 
+    <?php                       
+                                $cardInfoRow = mysqli_fetch_array(mysqli_query($connectDB, "SELECT * FROM registered_user WHERE user_id = '$user_id'"));
+                                if($subtotalAfterRedeemed == false) {
+                                    if($row['orders_subtotal'] > $cardInfoRow['registered_cardBalance']) {
+                                        echo 'disabled';
+                                    } else {
+                                        if(isset($_POST['payment_method']) && ($_POST['payment_method'] == 'Membership Card')) {
+                                            echo 'checked';
+                                        }
+                                    }
+                                } else {
+                                    if($subtotalAfterRedeemed > $cardInfoRow['registered_cardBalance']) {
+                                        echo 'disabled';
+                                    } else {
+                                        if(isset($_POST['payment_method']) && ($_POST['payment_method'] == 'Membership Card')) {
+                                            echo 'checked';
+                                        }
+                                    }
+                                }
+    ?>                      >
                             <label for="card"><b>Membership Card</b></label>
                             <input type="radio" name="payment_method" value="Cash" id="cash" <?php if(isset($_POST['payment_method']) && ($_POST['payment_method'] == 'Cash')) { echo 'checked';}?>>
                             <label for="cash"><b>Cash</b></label>

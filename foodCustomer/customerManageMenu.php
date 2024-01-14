@@ -14,9 +14,10 @@
     <!--  -->
     <!--  -->
     <?php 
-        if(!isset($_SESSION['kiosk_id'])) {
-            $_SESSION['kiosk_id'] = $_GET['kiosk_id'];
+        if(isset($_SESSION['kiosk_id'])) {
+            unset($_SESSION['kiosk_id']);
         }
+        $_SESSION['kiosk_id'] = $_GET['kiosk_id'];
     ?>
     <!--  -->
     <!--  -->
@@ -214,7 +215,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-1 mt-n2" style="padding-left: 6px; padding-right: 12px;">
-                                                <img src="../images/QR.png" style="width: 35px;" alt="">
+                                                <img src="../images/qr/qr_<?php echo $foodName;?>.png" style="width: 35px;" alt="">
                                             </div>
                                         </div>                                           
                                     </div>                                    
@@ -232,7 +233,13 @@
                                     <div class="row justify-content-end" style="padding-left: 6px; padding-right: 12px;">
                                         <div class="col-6"></div>
                                         <div class="col-3 offset-2 btn-group">
-                                            <button class="btn search-btn transition" type="submit" name="addFoodtoBasket" value="<?php echo $foodId;?>">
+                                            <button class="btn search-btn transition" type="submit" name="addFoodtoBasket" value="<?php echo $foodId;?>"
+            <?php
+                                                if(isset($_SESSION['basket_id']) && $_SESSION['basket_id'] != $_SESSION['kiosk_id']) {
+                                                    echo 'disabled';
+                                                }
+            ?>
+                                            >
                                                 <i class="fa-solid fa-plus"></i>
                                             </button>
                                         </div>

@@ -607,3 +607,12 @@ table {
     position: absolute;
     right: 20px;
 }
+
+.prepared_completed_button {
+    background-color: rgb(54, 156, 176);
+    border: none;
+    border-radius: 4px;
+    height: 70px;
+    color: white;
+    font-size: 20px;
+}
