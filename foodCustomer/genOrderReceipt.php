@@ -79,9 +79,17 @@
                 </tr>
             </table>
         </div>
-        <div class="qr_center_container">
-            <img src="../images/QR.png" alt="qr">
-        </div>
+        <br>
+        <div class="qr_center_container" id="qr_receipt"></div>
         <p class="text_align_center">Scan me</p>
+
+        <script src="../node_modules/qrcode.min.js"></script>
+        <script>
+            const QRElement = document.getElementById('qr_receipt');
+            new QRCode(QRElement, {
+                text: '<?php echo "Total: RM {$ordersRow['orders_subtotal']}"?>',
+                colorDark: 'rgb(54, 156, 176)',
+            });
+        </script>
     </body>
 </html>

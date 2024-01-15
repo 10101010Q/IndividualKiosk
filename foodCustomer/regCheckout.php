@@ -1,4 +1,9 @@
-<?php session_start();?>
+<?php 
+    session_start();
+    if(!(isset($_SESSION['admin_id']) || isset($_SESSION['vendor_id']) || isset($_SESSION['user_id']))){
+        header('location:../loginWebsite/login_form.php');
+     }
+?>
 <!DOCTYPE html>
 <html>
     <head>

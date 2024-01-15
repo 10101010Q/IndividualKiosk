@@ -168,7 +168,7 @@
                     if ($rows == 0) {
                         echo "The menu is empty.";
                     } else {
-                        $sql = "SELECT * FROM food WHERE kiosk_id= $kioskId AND food_availability= 'Available'";
+                        $sql = "SELECT * FROM food WHERE kiosk_id= $kioskId AND food_availability= 'Available' AND food_remainingQuantity> 0";
                         $run = mysqli_query($conn, $sql);
                         $count = mysqli_num_rows($run);
 

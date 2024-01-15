@@ -65,5 +65,11 @@
             <br>
             <button type="submit" class="checkout_button" name="placeOrderGen" formaction="<?php echo htmlspecialchars('../processing.php')?>" formmethod="POST">Place Order</button>
         </form>
+
+    <?php 
+        if(!(isset($_SESSION['admin_id']) || isset($_SESSION['vendor_id']) || isset($_SESSION['user_id']))){
+            header('location:../loginWebsite/login_form.php');
+        }
+    ?>
     </body>
 </html>

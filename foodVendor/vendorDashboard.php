@@ -87,7 +87,7 @@ include('conf.php');
 
 <div class="container">
     <div class="row mb-3">
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="card bg-primary bg-gradient mb-2 bg-opacity-75">
                 <div class="card-body text-white">
                     <p class="h3 text-black">Sales (Monthly)</p>
@@ -95,7 +95,7 @@ include('conf.php');
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="card bg-secondary bg-gradient mb-2 bg-opacity-75">
                 <div class="card-body text-white">
                     <p class="h3 text-black">Sales (Annually)</p>
@@ -103,7 +103,7 @@ include('conf.php');
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="card bg-success bg-gradient mb-2">
                 <div class="card-body text-white">
                     <p class="h3 text-black">Completed</p>
@@ -115,21 +115,13 @@ include('conf.php');
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div class="card bg-warning bg-gradient mb-2">
-                <div class="card-body text-white">
-                    <p class="h3 text-black">Task</p>
-                    <p class="h2">15</p>
-                </div>
-            </div>
-        </div>
     </div>
  
     <!-- 2nd row - Chart -->
     <div class="row my-5">
         <div class="col">
             <div class="card">
-                <div class="card-header h4">Sales (Monthly)</div>
+                <div class="card-header h4">Sales/ Orders (Monthly)</div>
                 <div class="card-body">
                     <div id="chart_line"></div>
                 </div>
@@ -175,43 +167,85 @@ $(document).ready(function() {
     $.post('api.php?getSales=1', {test: 123}, function (res) {
         console.log(res)
         var options = {
-                series: [{
-                name: "Sales (RM)",
-                data: res.sales
-            }],
-                chart: {
-                height: 350,
-                type: 'line',
-                zoom: {
-                enabled: false
+          series: [{
+            name: "Sales (RM)",
+            data: res.sales
+          },
+          {
+            name: "Orders",
+            data: res.orders
+          },
+        ],
+          chart: {
+          height: 350,
+          type: 'line',
+          zoom: {
+            enabled: false
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          width: [5, 7, 5],
+          curve: 'straight',
+          dashArray: [0, 8, 5]
+        },
+        title: {
+          text: 'Sales(RM)/ Orders',
+          align: 'left'
+        },
+        legend: {
+          tooltipHoverFormatter: function(val, opts) {
+            return val + ' - <strong>' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + '</strong>'
+          }
+        },
+        markers: {
+          size: 0,
+          hover: {
+            sizeOffset: 6
+          }
+        },
+        xaxis: {
+          categories: res.bulan,
+        },
+        tooltip: {
+          y: [
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " per month"
                 }
+              }
             },
-            dataLabels: {
-                enabled: false
+            {
+              title: {
+                formatter: function (val) {
+                  return val + " per month"
+                }
+              }
             },
-            stroke: {
-                curve: 'straight'
-            },
-            // title: {
-            //  text: 'Profit Gain Trends by Month',
-            //  align: 'left'
-            // },
-            grid: {
-                row: {
-                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                opacity: 0.5
-                },
-            },
-            xaxis: {
-                categories: res.bulan,
+            {
+              title: {
+                formatter: function (val) {
+                  return val;
+                }
+              }
             }
+          ]
+        },
+        grid: {
+          borderColor: '#f1f1f1',
+        }
         };
- 
+
         var chart = new ApexCharts(document.querySelector("#chart_line"), options);
         chart.render();
     }, 'json')
  
-   
+    
+
+    
  
     /* ========================================================================== Ni coding utk Staff DT */
     $.post('api.php?getFoodSold=1', {test: 123}, function (res) {
@@ -220,11 +254,11 @@ $(document).ready(function() {
         {
             $('#stf_dt tbody').append(`
                 <tr>
-                    <td>${res[i].sale_id}</td>
-                    <td>${res[i].food_name}</td>
-                    <td>${res[i].price}</td>
-                    <td>${res[i].quantity}</td>
-                    <td>${res[i].total_price}</td>
+                    <td>${res[i].food_id}</td>
+                    <td>${res[i].fName}</td>
+                    <td>${res[i].fPrice}</td>
+                    <td>${res[i].fQuantity}</td>
+                    <td>${res[i].fTotal}</td>
                 </tr>
             `)
         }

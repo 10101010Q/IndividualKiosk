@@ -37,7 +37,9 @@
                         }
     ?>
                     </td>
-                    <td><img src="../images/QR.png" alt="qrCode"></td>
+                    <td>
+                        <div id="orderQR" style="display: flex; justify-content: center;"></div>
+                    </td>
                     <td rowspan="2">
     <?php
                         if($ordersStatusRow['orders_status'] == 'Completed') {
@@ -215,5 +217,17 @@
                 echo 'No order';
             }
     ?>
+
+    <?php
+        if(!(isset($_SESSION['vendor_id']) OR isset($_SESSION['admin_id']) OR isset($_SESSION['user_id']))) {
+            header("location:../loginWebsite/login_form.php");
+        }
+    ?>
+    
+    <script src="../node_modules/qrcode.min.js"></script>
+    <script>
+        const qrDiv = document.getElementById('orderQR');
+        new QRCode(qrDiv, '<?php echo "Order ID: " . $vendorInfoRow['orders_id']; ?>');
+    </script>
     </body>
 </html>

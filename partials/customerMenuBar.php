@@ -53,7 +53,15 @@
                         ">MembershipCard</a>
                     </li>
                     <li class="nav-item mx-3">
-                        <a class="nav-link" href="#">Dashboard</a>
+                        <a class="nav-link" href="
+<?php
+                            if(isset($_SESSION['guest'])) {
+                                echo "";
+                            } else {
+                                echo "../foodCustomer/regDashboard.php";
+                            }
+?>
+                        ">Dashboard</a>
                     </li>
                     <li class="nav-item ms-3 me-5">
                         <a class="nav-link" href="#">Setting</a>
@@ -70,3 +78,8 @@
     </nav> 
 </div>
 
+<?php
+    if(!(isset($_SESSION['admin_id']) || isset($_SESSION['vendor_id']) || isset($_SESSION['user_id']))){
+        header('location:../loginWebsite/login_form.php');
+     }
+?>

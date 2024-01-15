@@ -28,10 +28,10 @@ if(isset($_POST['submit'])){
          //////////
          $connectDB = mysqli_connect('localhost', 'root', '', 'web_project');
          if($user_type == 'user') {
-            $insert2 = "INSERT INTO registered_user VALUES ('', '$name', '$pass', '$email', 10, 10)";
-            mysqli_query($connectDB, $insert2);
-            $insert3 = "INSERT INTO registered_or_general_user VALUES ((SELECT MAX(user_id) FROM registered_user), '012-3456789')";
+            $insert3 = "INSERT INTO registered_or_general_user VALUES ('', '012-3456789')";
             mysqli_query($connectDB, $insert3);
+            $insert2 = "INSERT INTO registered_user VALUES ((SELECT MAX(user_id) FROM registered_or_general_user), '$name', '$pass', '$email', 10, 10)";
+            mysqli_query($connectDB, $insert2);
          } else if($user_type == 'vendor') {
             $insert4 = "INSERT INTO food_vendor VALUES ('', 1, '$name', '$pass', '$email', '019-8765432', 'approve')";
             mysqli_query($connectDB, $insert4);

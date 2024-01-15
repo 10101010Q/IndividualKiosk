@@ -42,7 +42,7 @@
                         ">Order Status</a>
                     </li>
                     <li class="nav-item mx-3">
-                        <a class="nav-link active" href="
+                        <a class="nav-link" href="
 <?php
                             if(isset($_SESSION['guest'])) {
                                 echo "";
@@ -53,7 +53,7 @@
                         ">MembershipCard</a>
                     </li>
                     <li class="nav-item mx-3">
-                        <a class="nav-link" href="../foodCustomer/regDashboard.php">Dashboard</a>
+                        <a class="nav-link active" href="#">Dashboard</a>
                     </li>
                     <li class="nav-item ms-3 me-5">
                         <a class="nav-link" href="#">Setting</a>
